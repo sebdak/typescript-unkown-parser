@@ -1,4 +1,4 @@
-# TypeScript Unkown Parser ✅🃏
+# TypeScript Unkown Parser 🃏
 
 TypeScript is great tool for statically enforcing types at compile time, but this can quickly become a false security when dealing with unkown data from the "outside world".
 
@@ -15,7 +15,7 @@ npm i typescript-unknown-parser
 
 1. Make a class with expected typed properties. Extend it by UnknownParser imported from typescript-unknown-parser, and pass the class as a generic type argument.
 2. Call `super(data, 'MyClass')` with the unknown data and the name of the class
-3. Set all properties with the `protected` functions: `getString, getNumber, getBoolean, getIsoDate, getArray, getStringAsEnumKey, getArrayOfEnumKeys`
+3. Set all properties with the `protected` functions: `getPrimitive, getIsoDate, getArray, getStringAsEnumKey, getArrayOfEnumKeys`
 
 ```typescript
 import UnknownParser from 'typescript-unknown-parser';
@@ -26,8 +26,8 @@ class MyClass extends UnknownParser<MyClass> {
 
     constructor(data: any) {
         super(data, 'MyClass'); // Pass the name of the class as the second parameter
-        this.myString = this.getString('myString');
-        this.myRequiredString = this.getString('myRequiredString', 'REQUIRED');
+        this.myString = this.getPrimitive('myString', 'string');
+        this.myRequiredString = this.getPrimitive('myRequiredString', 'string', 'REQUIRED');
     }
 }
 ```

@@ -18,6 +18,30 @@ class UnknownParser<T> {
         }
     }
 
+    protected getPrimitive(prop: PropType<T>, primitive: 'string'): string | undefined;
+    protected getPrimitive(prop: PropType<T>, primitive: 'string', required: 'REQUIRED'): string;
+
+    protected getPrimitive(prop: PropType<T>, primitive: 'number'): number | undefined;
+    protected getPrimitive(prop: PropType<T>, primitive: 'number', required: 'REQUIRED'): number;
+
+    protected getPrimitive(prop: PropType<T>, primitive: 'boolean'): boolean | undefined;
+    protected getPrimitive(prop: PropType<T>, primitive: 'boolean', required: 'REQUIRED'): boolean;
+
+    protected getPrimitive(
+        prop: PropType<T>,
+        primitive: 'string' | 'number' | 'boolean',
+        required?: 'REQUIRED',
+    ): string | number | boolean | undefined {
+        const maybeProp = this.data[prop];
+        if (required === 'REQUIRED' || maybeProp !== undefined) {
+            this.assert(
+                typeof maybeProp === primitive,
+                `Property ${prop} of type ${typeof maybeProp} is not assignable to type ${primitive}`,
+            );
+            return maybeProp;
+        }
+    }
+
     protected getArray(prop: PropType<T>): Array<unknown> | undefined;
     protected getArray(prop: PropType<T>, required: 'REQUIRED'): Array<unknown>;
     protected getArray(prop: PropType<T>, required?: 'REQUIRED'): Array<unknown> | undefined {
@@ -31,57 +55,21 @@ class UnknownParser<T> {
         }
     }
 
-    protected getString(prop: PropType<T>): string | undefined;
-    protected getString(prop: PropType<T>, required: 'REQUIRED'): string;
-    protected getString(prop: PropType<T>, required?: 'REQUIRED'): string | undefined {
-        const maybeStr = this.data[prop];
-        if (required === 'REQUIRED' || maybeStr !== undefined) {
-            this.assert(
-                typeof maybeStr === 'string',
-                `Property ${prop} of type ${typeof maybeStr} is not assignable to type string`,
-            );
-            return maybeStr;
-        }
-    }
-
-    protected getNumber(prop: PropType<T>): number | undefined;
-    protected getNumber(prop: PropType<T>, required: 'REQUIRED'): number;
-    protected getNumber(prop: PropType<T>, required?: 'REQUIRED'): number | undefined {
-        const maybeNumber = this.data[prop];
-        if (required === 'REQUIRED' || maybeNumber !== undefined) {
-            this.assert(
-                typeof maybeNumber === 'number',
-                `Property ${prop} of type ${typeof maybeNumber} is not assignable to type number`,
-            );
-            return maybeNumber;
-        }
-    }
-
-    protected getBoolean(prop: PropType<T>): boolean | undefined;
-    protected getBoolean(prop: PropType<T>, required: 'REQUIRED'): boolean;
-    protected getBoolean(prop: PropType<T>, required?: 'REQUIRED'): boolean | undefined {
-        const maybeBoolean = this.data[prop];
-        if (required === 'REQUIRED' || maybeBoolean !== undefined) {
-            this.assert(
-                typeof maybeBoolean === 'boolean',
-                `Property ${prop} of type ${typeof maybeBoolean} is not assignable to type boolean`,
-            );
-            return maybeBoolean;
-        }
-    }
-
-    protected getIsoDate(prop: PropType<T>): Date | undefined;
-    protected getIsoDate(prop: PropType<T>, required: 'REQUIRED'): Date;
-    protected getIsoDate(prop: PropType<T>, required?: 'REQUIRED'): Date | undefined {
+    protected getDate(prop: PropType<T>): Date | undefined;
+    protected getDate(prop: PropType<T>, required: 'REQUIRED'): Date;
+    protected getDate(prop: PropType<T>, required?: 'REQUIRED'): Date | undefined {
         const maybeDateString = this.data[prop];
         if (required === 'REQUIRED' || maybeDateString !== undefined) {
             this.assert(
                 typeof maybeDateString === 'string',
                 `Property ${prop} of type ${typeof maybeDateString} can not be parsed as date`,
             );
-            const isoDateRegex = /(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/;
+            const s = '-';
+            const validator = new RegExp(
+                `^(?!0{4}${s}0{2}${s}0{2})((?=[0-9]{4}${s}(((0[^2])|1[0-2])|02(?=${s}(([0-1][0-9])|2[0-8])))${s}[0-9]{2})|(?=((([13579][26])|([2468][048])|(0[48]))0{2})|([0-9]{2}((((0|[2468])[48])|[2468][048])|([13579][26])))${s}02${s}29))([0-9]{4})${s}(?!((0[469])|11)${s}31)((0[1,3-9]|1[0-2])|(02(?!${s}3)))${s}([0-2][0-9]|3[0-1])$`,
+            );
             this.assert(
-                isoDateRegex.test(maybeDateString),
+                validator.test(maybeDateString),
                 `Property ${prop} with value ${maybeDateString} is not a valid date`,
             );
             return new Date(maybeDateString);
