@@ -18,9 +18,9 @@ class UnknownParser<T> {
         }
     }
 
-    getArray(prop: PropType<T>): Array<unknown> | undefined;
-    getArray(prop: PropType<T>, required: 'REQUIRED'): Array<unknown>;
-    getArray(prop: PropType<T>, required?: 'REQUIRED'): Array<unknown> | undefined {
+    protected getArray(prop: PropType<T>): Array<unknown> | undefined;
+    protected getArray(prop: PropType<T>, required: 'REQUIRED'): Array<unknown>;
+    protected getArray(prop: PropType<T>, required?: 'REQUIRED'): Array<unknown> | undefined {
         const maybeArray = this.data[prop];
         if (required === 'REQUIRED' || maybeArray !== undefined) {
             this.assert(
@@ -31,9 +31,9 @@ class UnknownParser<T> {
         }
     }
 
-    getString(prop: PropType<T>): string | undefined;
-    getString(prop: PropType<T>, required: 'REQUIRED'): string;
-    getString(prop: PropType<T>, required?: 'REQUIRED'): string | undefined {
+    protected getString(prop: PropType<T>): string | undefined;
+    protected getString(prop: PropType<T>, required: 'REQUIRED'): string;
+    protected getString(prop: PropType<T>, required?: 'REQUIRED'): string | undefined {
         const maybeStr = this.data[prop];
         if (required === 'REQUIRED' || maybeStr !== undefined) {
             this.assert(
@@ -44,9 +44,9 @@ class UnknownParser<T> {
         }
     }
 
-    getNumber(prop: PropType<T>): number | undefined;
-    getNumber(prop: PropType<T>, required: 'REQUIRED'): number;
-    getNumber(prop: PropType<T>, required?: 'REQUIRED'): number | undefined {
+    protected getNumber(prop: PropType<T>): number | undefined;
+    protected getNumber(prop: PropType<T>, required: 'REQUIRED'): number;
+    protected getNumber(prop: PropType<T>, required?: 'REQUIRED'): number | undefined {
         const maybeNumber = this.data[prop];
         if (required === 'REQUIRED' || maybeNumber !== undefined) {
             this.assert(
@@ -57,9 +57,9 @@ class UnknownParser<T> {
         }
     }
 
-    getBoolean(prop: PropType<T>): boolean | undefined;
-    getBoolean(prop: PropType<T>, required: 'REQUIRED'): boolean;
-    getBoolean(prop: PropType<T>, required?: 'REQUIRED'): boolean | undefined {
+    protected getBoolean(prop: PropType<T>): boolean | undefined;
+    protected getBoolean(prop: PropType<T>, required: 'REQUIRED'): boolean;
+    protected getBoolean(prop: PropType<T>, required?: 'REQUIRED'): boolean | undefined {
         const maybeBoolean = this.data[prop];
         if (required === 'REQUIRED' || maybeBoolean !== undefined) {
             this.assert(
@@ -70,9 +70,9 @@ class UnknownParser<T> {
         }
     }
 
-    getIsoDate(prop: PropType<T>): Date | undefined;
-    getIsoDate(prop: PropType<T>, required: 'REQUIRED'): Date;
-    getIsoDate(prop: PropType<T>, required?: 'REQUIRED'): Date | undefined {
+    protected getIsoDate(prop: PropType<T>): Date | undefined;
+    protected getIsoDate(prop: PropType<T>, required: 'REQUIRED'): Date;
+    protected getIsoDate(prop: PropType<T>, required?: 'REQUIRED'): Date | undefined {
         const maybeDateString = this.data[prop];
         if (required === 'REQUIRED' || maybeDateString !== undefined) {
             this.assert(
@@ -88,9 +88,9 @@ class UnknownParser<T> {
         }
     }
 
-    getStringAsEnumKey<K>(e: K, prop: PropType<T>): keyof K | undefined;
-    getStringAsEnumKey<K>(e: K, prop: PropType<T>, required: 'REQUIRED'): keyof K;
-    getStringAsEnumKey<K>(e: K, prop: PropType<T>, required?: 'REQUIRED'): keyof K | undefined {
+    protected getStringAsEnumKey<K>(e: K, prop: PropType<T>): keyof K | undefined;
+    protected getStringAsEnumKey<K>(e: K, prop: PropType<T>, required: 'REQUIRED'): keyof K;
+    protected getStringAsEnumKey<K>(e: K, prop: PropType<T>, required?: 'REQUIRED'): keyof K | undefined {
         const maybeEnumKey = this.data[prop];
         if (required === 'REQUIRED') {
             this.assert(
@@ -106,9 +106,13 @@ class UnknownParser<T> {
         }
     }
 
-    getArrayOfEnumKeys<EnumT>(e: EnumT, prop: keyof T): Array<keyof EnumT> | undefined;
-    getArrayOfEnumKeys<EnumT>(e: EnumT, prop: keyof T, required: 'REQUIRED'): Array<keyof EnumT>;
-    getArrayOfEnumKeys<EnumT>(e: EnumT, prop: keyof T, required?: 'REQUIRED'): Array<keyof EnumT> | undefined {
+    protected getArrayOfEnumKeys<EnumT>(e: EnumT, prop: keyof T): Array<keyof EnumT> | undefined;
+    protected getArrayOfEnumKeys<EnumT>(e: EnumT, prop: keyof T, required: 'REQUIRED'): Array<keyof EnumT>;
+    protected getArrayOfEnumKeys<EnumT>(
+        e: EnumT,
+        prop: keyof T,
+        required?: 'REQUIRED',
+    ): Array<keyof EnumT> | undefined {
         const enumKeys = Object.keys(e);
         const maybeArray = this.data[prop];
         if (required === 'REQUIRED' || maybeArray !== undefined) {
@@ -130,3 +134,5 @@ class UnknownParser<T> {
         }
     }
 }
+
+export default UnknownParser;
