@@ -42,19 +42,6 @@ class UnknownParser<T> {
         }
     }
 
-    protected getArray(prop: PropType<T>): Array<unknown> | undefined;
-    protected getArray(prop: PropType<T>, required: 'REQUIRED'): Array<unknown>;
-    protected getArray(prop: PropType<T>, required?: 'REQUIRED'): Array<unknown> | undefined {
-        const maybeArray = this.data[prop];
-        if (required === 'REQUIRED' || maybeArray !== undefined) {
-            this.assert(
-                Array.isArray(maybeArray),
-                `Property ${prop} of type ${typeof maybeArray} is not assignable to type array`,
-            );
-            return maybeArray;
-        }
-    }
-
     protected getDate(prop: PropType<T>): Date | undefined;
     protected getDate(prop: PropType<T>, required: 'REQUIRED'): Date;
     protected getDate(prop: PropType<T>, required?: 'REQUIRED'): Date | undefined {
@@ -76,31 +63,40 @@ class UnknownParser<T> {
         }
     }
 
-    protected getStringAsEnumKey<K>(e: K, prop: PropType<T>): keyof K | undefined;
-    protected getStringAsEnumKey<K>(e: K, prop: PropType<T>, required: 'REQUIRED'): keyof K;
-    protected getStringAsEnumKey<K>(e: K, prop: PropType<T>, required?: 'REQUIRED'): keyof K | undefined {
-        const maybeEnumKey = this.data[prop];
-        if (required === 'REQUIRED') {
+    protected getArray(prop: PropType<T>): Array<unknown> | undefined;
+    protected getArray(prop: PropType<T>, required: 'REQUIRED'): Array<unknown>;
+    protected getArray(prop: PropType<T>, required?: 'REQUIRED'): Array<unknown> | undefined {
+        const maybeArray = this.data[prop];
+        if (required === 'REQUIRED' || maybeArray !== undefined) {
             this.assert(
-                typeof maybeEnumKey === 'string',
-                `Property ${prop} of type ${typeof maybeEnumKey} is not assignable as enum key`,
+                Array.isArray(maybeArray),
+                `Property ${prop} of type ${typeof maybeArray} is not assignable to type array`,
             );
-            this.assert(
-                Object.keys(e).includes(maybeEnumKey),
-                `Could not match any enum key to property ${prop} with value ${maybeEnumKey}`,
-            );
-            // TODO: see if this can be typesafe
-            return maybeEnumKey as keyof K;
+            return maybeArray;
         }
     }
 
-    protected getArrayOfEnumKeys<EnumT>(e: EnumT, prop: keyof T): Array<keyof EnumT> | undefined;
-    protected getArrayOfEnumKeys<EnumT>(e: EnumT, prop: keyof T, required: 'REQUIRED'): Array<keyof EnumT>;
-    protected getArrayOfEnumKeys<EnumT>(
-        e: EnumT,
-        prop: keyof T,
-        required?: 'REQUIRED',
-    ): Array<keyof EnumT> | undefined {
+    protected getEnum<K>(e: K, prop: PropType<T>): keyof K | undefined;
+    protected getEnum<K>(e: K, prop: PropType<T>, required: 'REQUIRED'): keyof K;
+    protected getEnum<K>(e: K, prop: PropType<T>, required?: 'REQUIRED'): keyof K | undefined {
+        const maybeEnum = this.data[prop];
+        if (required === 'REQUIRED' || maybeEnum !== undefined) {
+            this.assert(
+                typeof maybeEnum === 'string',
+                `Property ${prop} of type ${typeof maybeEnum} is not assignable as enum key`,
+            );
+            this.assert(
+                Object.keys(e).includes(maybeEnum),
+                `Could not match any enum key to property ${prop} with value ${maybeEnum}`,
+            );
+            // TODO: see if this can be typesafe
+            return maybeEnum as keyof K;
+        }
+    }
+
+    protected getArrayOfEnum<EnumT>(e: EnumT, prop: keyof T): Array<keyof EnumT> | undefined;
+    protected getArrayOfEnum<EnumT>(e: EnumT, prop: keyof T, required: 'REQUIRED'): Array<keyof EnumT>;
+    protected getArrayOfEnum<EnumT>(e: EnumT, prop: keyof T, required?: 'REQUIRED'): Array<keyof EnumT> | undefined {
         const enumKeys = Object.keys(e);
         const maybeArray = this.data[prop];
         if (required === 'REQUIRED' || maybeArray !== undefined) {

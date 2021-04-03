@@ -29,7 +29,7 @@ describe('UnknownParser', () => {
                     reqBool: true,
                 };
                 const test = new Primitives(unknownObj);
-                expect(test.reqString).toBe('test');
+                expect(test.reqString).toEqual('test');
             });
 
             it('Parses non-required string', () => {
@@ -40,7 +40,7 @@ describe('UnknownParser', () => {
                     reqBool: true,
                 };
                 const test = new Primitives(unknownObj);
-                expect(test.str).toBe('non-req');
+                expect(test.str).toEqual('non-req');
             });
 
             it('Throw error if required string is missing', () => {
@@ -84,7 +84,7 @@ describe('UnknownParser', () => {
                     reqBool: true,
                 };
                 const test = new Primitives(unknownObj);
-                expect(test.reqNum).toBe(123);
+                expect(test.reqNum).toEqual(123);
             });
 
             it('Parses non-required number', () => {
@@ -95,7 +95,7 @@ describe('UnknownParser', () => {
                     reqBool: true,
                 };
                 const test = new Primitives(unknownObj);
-                expect(test.num).toBe(123);
+                expect(test.num).toEqual(123);
             });
 
             it('Throw error if required number is missing', () => {
@@ -139,7 +139,7 @@ describe('UnknownParser', () => {
                     reqBool: true,
                 };
                 const test = new Primitives(unknownObj);
-                expect(test.reqBool).toBe(true);
+                expect(test.reqBool).toEqual(true);
             });
 
             it('Parses non-required boolean', () => {
@@ -150,7 +150,7 @@ describe('UnknownParser', () => {
                     bool: false,
                 };
                 const test = new Primitives(unknownObj);
-                expect(test.bool).toBe(false);
+                expect(test.bool).toEqual(false);
             });
 
             it('Throw error if required boolean is missing', () => {
@@ -228,6 +228,204 @@ describe('UnknownParser', () => {
             };
             expect(() => {
                 new MyDate(unknownObj);
+            }).toThrowError(TypeError);
+        });
+    });
+
+    describe('Array', () => {
+        class MyArray extends UnknownParser<MyArray> {
+            arr?: any[];
+            reqArr: any[];
+
+            constructor(data: any) {
+                super(data, 'MyArray');
+                this.arr = this.getArray('arr');
+                this.reqArr = this.getArray('reqArr', 'REQUIRED');
+            }
+        }
+
+        it('Parses required array', () => {
+            const unknownObj = {
+                reqArr: [],
+            };
+            const test = new MyArray(unknownObj);
+            expect(test.reqArr).toEqual([]);
+        });
+
+        it('Parses non-required array', () => {
+            const unknownObj = {
+                reqArr: [],
+                arr: [],
+            };
+            const test = new MyArray(unknownObj);
+            expect(test.arr).toEqual([]);
+        });
+
+        it('Throws error if required array is missing', () => {
+            const unknownObj = {};
+            expect(() => {
+                new MyArray(unknownObj);
+            }).toThrowError(TypeError);
+        });
+
+        it('Returns undefined if non-required array is missing', () => {
+            const unknownObj = {
+                reqArr: [],
+            };
+            const test = new MyArray(unknownObj);
+            expect(test.arr).toBeUndefined();
+        });
+
+        it('Throws error if required array is of wrong type', () => {
+            const unknownObj = {
+                reqArr: 'test',
+            };
+            expect(() => {
+                new MyArray(unknownObj);
+            }).toThrowError(TypeError);
+        });
+
+        it('Throws error if non-required array is defined but is of wrong type', () => {
+            const unknownObj = {
+                reqArr: [],
+                arr: 'test',
+            };
+            expect(() => {
+                new MyArray(unknownObj);
+            }).toThrowError(TypeError);
+        });
+    });
+
+    describe('Enum', () => {
+        enum MyEnum {
+            ONE,
+            TWO,
+            THREE,
+        }
+
+        class MyEnumClass extends UnknownParser<MyEnumClass> {
+            enumProp?: keyof typeof MyEnum;
+            reqEnumProp: keyof typeof MyEnum;
+
+            constructor(data: any) {
+                super(data, 'MyEnumClass');
+                this.enumProp = this.getEnum(MyEnum, 'enumProp');
+                this.reqEnumProp = this.getEnum(MyEnum, 'reqEnumProp', 'REQUIRED');
+            }
+        }
+
+        it('Parses required enum', () => {
+            const unknownObj = {
+                reqEnumProp: 'ONE',
+            };
+            const test = new MyEnumClass(unknownObj);
+            expect(test.reqEnumProp).toEqual('ONE');
+        });
+
+        it('Parses non-required enum', () => {
+            const unknownObj = {
+                reqEnumProp: 'ONE',
+                enumProp: 'TWO',
+            };
+            const test = new MyEnumClass(unknownObj);
+            expect(test.enumProp).toEqual('TWO');
+        });
+
+        it('Returns undefined if non-required enum is missing', () => {
+            const unknownObj = {
+                reqEnumProp: 'ONE',
+            };
+            const test = new MyEnumClass(unknownObj);
+            expect(test.enumProp).toBeUndefined();
+        });
+
+        it('Throws error if required enum is not included in the expected enum', () => {
+            const unknownObj = {
+                reqEnumProp: 'TEST',
+            };
+            expect(() => {
+                new MyEnumClass(unknownObj);
+            }).toThrowError(TypeError);
+        });
+
+        it('Throws error if non-required enum is not included in the expected enum', () => {
+            const unknownObj = {
+                reqEnumProp: 'ONE',
+                enumProp: 'TEST',
+            };
+            expect(() => {
+                new MyEnumClass(unknownObj);
+            }).toThrowError(TypeError);
+        });
+    });
+
+    describe('Array of enum', () => {
+        enum MyEnum {
+            ONE,
+            TWO,
+            THREE,
+        }
+
+        class MyEnumClass extends UnknownParser<MyEnumClass> {
+            enumArr?: (keyof typeof MyEnum)[];
+            reqEnumArr: (keyof typeof MyEnum)[];
+
+            constructor(data: any) {
+                super(data, 'MyEnumClass');
+                this.enumArr = this.getArrayOfEnum(MyEnum, 'enumArr');
+                this.reqEnumArr = this.getArrayOfEnum(MyEnum, 'reqEnumArr', 'REQUIRED');
+            }
+        }
+
+        it('Parses required array of enum', () => {
+            const unknownObj = {
+                reqEnumArr: ['ONE', 'TWO', 'THREE'],
+            };
+            const test = new MyEnumClass(unknownObj);
+            expect(test.reqEnumArr).toEqual(['ONE', 'TWO', 'THREE']);
+        });
+
+        it('Parses empty array', () => {
+            const unknownObj = {
+                reqEnumArr: [],
+            };
+            const test = new MyEnumClass(unknownObj);
+            expect(test.reqEnumArr).toEqual([]);
+        });
+
+        it('Parses non-required array of enum', () => {
+            const unknownObj = {
+                reqEnumArr: ['THREE'],
+                enumArr: ['ONE', 'TWO', 'THREE'],
+            };
+            const test = new MyEnumClass(unknownObj);
+            expect(test.enumArr).toEqual(['ONE', 'TWO', 'THREE']);
+        });
+
+        it('Returns undefined if non-required array of enum is missing', () => {
+            const unknownObj = {
+                reqEnumArr: ['ONE', 'TWO'],
+            };
+            const test = new MyEnumClass(unknownObj);
+            expect(test.enumArr).toBeUndefined();
+        });
+
+        it('Throws error if required enum is not included in the expected enum', () => {
+            const unknownObj = {
+                reqEnumArr: ['ONE', 'TEST'],
+            };
+            expect(() => {
+                new MyEnumClass(unknownObj);
+            }).toThrowError(TypeError);
+        });
+
+        it('Throws error if non-required enum is not included in the expected enum', () => {
+            const unknownObj = {
+                reqEnumArr: ['THREE'],
+                enumArr: ['TEST', 'TWO', 'THREE'],
+            };
+            expect(() => {
+                new MyEnumClass(unknownObj);
             }).toThrowError(TypeError);
         });
     });
